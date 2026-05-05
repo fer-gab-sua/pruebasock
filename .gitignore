@@ -9,9 +9,7 @@ venv/
 env/
 ENV/
 
-# Base de datos SQLite
-*.sqlite3
-db.sqlite3
+
 
 # Archivos de Django
 *.log
