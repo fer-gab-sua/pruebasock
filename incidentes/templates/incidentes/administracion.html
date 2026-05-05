@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Incidentes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #764ba2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #667eea;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .incidentes-list {
+            margin-top: 20px;
+        }
+        
+        .incidente-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .incidente-info {
+            flex: 1;
+        }
+        
+        .incidente-numero {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .incidente-estado {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .estado-pendiente {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .estado-asignada {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .estado-cerrada {
+            background: #28a745;
+            color: white;
+        }
+        
+        .incidente-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .incidente-fecha {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Administración de Incidentes</h1>
+        
+        <div class="nav-links">
+            <a href="{% url 'consulta' %}">Ver Página de Consulta</a>
+        </div>
+        
+        <div class="form-section">
+            <h2>Crear o Actualizar Incidente</h2>
+            <form method="post" action="{% url 'administracion' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="numero_incidente">Número de Incidente:</label>
+                    <input type="text" id="numero_incidente" name="numero_incidente" required placeholder="Ej: INC-2024-001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <select id="estado" name="estado">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="asignada">Asignada</option>
+                        <option value="cerrada">Cerrada</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Guardar Incidente</button>
+            </form>
+        </div>
+        
+        <div class="incidentes-list">
+            <h2>Incidentes Existentes</h2>
+            {% if incidentes %}
+                {% for incidente in incidentes %}
+                <div class="incidente-item">
+                    <div class="incidente-info">
+                        <div class="incidente-numero">{{ incidente.numero_incidente }}</div>
+                        <span class="incidente-estado estado-{{ incidente.estado }}">
+                            {{ incidente.get_estado_display }}
+                        </span>
+                        <div class="incidente-fecha">
+                            Creado: {{ incidente.fecha_creacion|date:"d/m/Y H:i" }} | 
+                            Actualizado: {{ incidente.fecha_actualizacion|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                    <div class="incidente-actions">
+                        <select onchange="actualizarEstado({{ incidente.id }}, this.value)" class="estado-select">
+                            <option value="pendiente" {% if incidente.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="asignada" {% if incidente.estado == 'asignada' %}selected{% endif %}>Asignada</option>
+                            <option value="cerrada" {% if incidente.estado == 'cerrada' %}selected{% endif %}>Cerrada</option>
+                        </select>
+                        <button onclick="eliminarIncidente({{ incidente.id }})" class="btn btn-small btn-danger">Eliminar</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #888; padding: 20px;">No hay incidentes registrados.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function actualizarEstado(incidenteId, nuevoEstado) {
+            fetch(`/actualizar-estado/${incidenteId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `estado=${nuevoEstado}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+        
+        function eliminarIncidente(incidenteId) {
+            if (confirm('¿Está seguro de que desea eliminar este incidente?')) {
+                fetch(`/eliminar-incidente/${incidenteId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            }
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

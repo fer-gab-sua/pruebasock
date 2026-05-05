@@ -1,0 +1,32 @@
+# Ignorar archivos de Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entorno virtual
+venv/
+env/
+ENV/
+
+# Base de datos SQLite
+*.sqlite3
+db.sqlite3
+
+# Archivos de Django
+*.log
+local_settings.py
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Migraciones (opcional - descomenta si no quieres versionar migraciones)
+# */migrations/*.py
+# !*/migrations/__init__.py
