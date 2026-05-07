@@ -354,12 +354,17 @@
         
         // Guardar el estado anterior de los incidentes para detectar cambios
         let estadosAnteriores = {};
+        let timestampsCambios = {}; // Guardar cuándo ocurrió cada cambio
         
         // Cargar estados anteriores del localStorage
         try {
             const savedStates = localStorage.getItem('incidentesEstados');
             if (savedStates) {
                 estadosAnteriores = JSON.parse(savedStates);
+            }
+            const savedTimestamps = localStorage.getItem('timestampsCambios');
+            if (savedTimestamps) {
+                timestampsCambios = JSON.parse(savedTimestamps);
             }
         } catch (e) {
             console.error('Error al cargar estados anteriores:', e);
@@ -441,15 +446,25 @@
             
             // Detectar cambios y actualizar estados
             const nuevosEstados = {};
+            const ahora = Date.now();
             
             incidentes.forEach(incidente => {
                 const estadoAnterior = estadosAnteriores[incidente.numero_incidente];
                 const cambioEstado = estadoAnterior && estadoAnterior !== incidente.estado;
                 
+                // Si hubo cambio de estado, guardar el timestamp
+                if (cambioEstado) {
+                    timestampsCambios[incidente.numero_incidente] = ahora;
+                }
+                
                 // Guardar nuevo estado
                 nuevosEstados[incidente.numero_incidente] = incidente.estado;
                 
-                const card = crearCardIncidente(incidente, cambioEstado);
+                // Verificar si el cambio fue reciente (últimos 30 segundos)
+                const timestampCambio = timestampsCambios[incidente.numero_incidente];
+                const cambioReciente = timestampCambio && (ahora - timestampCambio) < 30000; // 30 segundos
+                
+                const card = crearCardIncidente(incidente, cambioReciente);
                 
                 // Agregar a la columna correspondiente
                 const columnId = `column${capitalize(incidente.estado)}`;
@@ -461,8 +476,19 @@
             
             // Guardar estados actuales
             estadosAnteriores = nuevosEstados;
+            
+            // Limpiar timestamps antiguos (mayores a 30 segundos)
+            const timestampsLimpios = {};
+            Object.keys(timestampsCambios).forEach(key => {
+                if ((ahora - timestampsCambios[key]) < 30000) {
+                    timestampsLimpios[key] = timestampsCambios[key];
+                }
+            });
+            timestampsCambios = timestampsLimpios;
+            
             try {
                 localStorage.setItem('incidentesEstados', JSON.stringify(nuevosEstados));
+                localStorage.setItem('timestampsCambios', JSON.stringify(timestampsCambios));
             } catch (e) {
                 console.error('Error al guardar estados:', e);
             }
@@ -514,19 +540,6 @@
                     <div><span class="fecha-label">Actualizado:</span> ${fechaActualizacion}</div>
                 </div>
             `;
-            
-            // Remover el badge después de 5 segundos
-            if (cambioEstado) {
-                setTimeout(() => {
-                    const badge = card.querySelector('.change-badge');
-                    if (badge) {
-                        badge.style.transition = 'opacity 0.5s';
-                        badge.style.opacity = '0';
-                        setTimeout(() => badge.remove(), 500);
-                    }
-                    card.classList.remove('changed');
-                }, 5000);
-            }
             
             return card;
         }
