@@ -150,7 +150,7 @@ def sincronizar_metabase(request):
             
             if numero_prestacion:
                 # Usar NumeroDePrestacion como número de incidente
-                numero_incidente = f"PREST-{numero_prestacion}"
+                numero_incidente = numero_prestacion
                 
                 # Crear o actualizar incidente
                 incidente, created = Incidente.objects.get_or_create(
