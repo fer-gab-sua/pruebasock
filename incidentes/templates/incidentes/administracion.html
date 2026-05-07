@@ -182,6 +182,80 @@
             color: #888;
             margin-top: 5px;
         }
+        
+        .auto-sync-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #2196f3;
+        }
+        
+        .auto-sync-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-wrapper label {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .sync-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .sync-status.inactive {
+            background: #ccc;
+            color: #666;
+        }
+        
+        .sync-status.active {
+            background: #4caf50;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .sync-status.syncing {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .sync-status.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .sync-info {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -190,6 +264,19 @@
         
         <div class="nav-links">
             <a href="{% url 'consulta' %}">Ver Página de Consulta</a>
+        </div>
+        
+        <div class="auto-sync-section">
+            <div class="auto-sync-controls">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="autoSyncCheckbox">
+                    <label for="autoSyncCheckbox">Sincronización Automática</label>
+                </div>
+                <span id="syncStatus" class="sync-status inactive">Inactivo</span>
+            </div>
+            <div class="sync-info" id="syncInfo">
+                Activa la sincronización automática para traer incidentes de Metabase cada 5 segundos.
+            </div>
         </div>
         
         <div class="form-section">
@@ -294,6 +381,113 @@
                 }
             }
             return cookieValue;
+        }
+        
+        // ==================== SINCRONIZACIÓN AUTOMÁTICA ====================
+        let syncInterval = null;
+        const checkbox = document.getElementById('autoSyncCheckbox');
+        const statusIndicator = document.getElementById('syncStatus');
+        const syncInfo = document.getElementById('syncInfo');
+        
+        // Cargar estado previo del localStorage
+        const savedSyncState = localStorage.getItem('autoSyncEnabled');
+        if (savedSyncState === 'true') {
+            checkbox.checked = true;
+            startAutoSync();
+        }
+        
+        // Escuchar cambios en el checkbox
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                startAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'true');
+            } else {
+                stopAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'false');
+            }
+        });
+        
+        function startAutoSync() {
+            updateStatus('active', 'Activo - Sincronizando cada 5 segundos');
+            
+            // Sincronizar inmediatamente
+            sincronizarMetabase();
+            
+            // Configurar intervalo de 5 segundos
+            syncInterval = setInterval(() => {
+                sincronizarMetabase();
+            }, 5000);
+        }
+        
+        function stopAutoSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+            }
+            updateStatus('inactive', 'Inactivo');
+        }
+        
+        function sincronizarMetabase() {
+            updateStatus('syncing', 'Sincronizando...');
+            
+            fetch('/sincronizar-metabase/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const mensaje = `✓ Sincronizado: ${data.nuevos} nuevos, ${data.actualizados} actualizados, ${data.total} total`;
+                    updateStatus('active', mensaje);
+                    
+                    // Recargar la página si hay cambios
+                    if (data.nuevos > 0 || data.actualizados > 0) {
+                        location.reload();
+                    }
+                } else {
+                    updateStatus('error', `Error: ${data.error}`);
+                    // Volver a estado activo después de 3 segundos
+                    setTimeout(() => {
+                        if (checkbox.checked) {
+                            updateStatus('active', 'Activo - Sincronizando cada 5 segundos');
+                        }
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error en sincronización:', error);
+                updateStatus('error', 'Error de conexión');
+                // Volver a estado activo después de 3 segundos
+                setTimeout(() => {
+                    if (checkbox.checked) {
+                        updateStatus('active', 'Activo - Sincronizando cada 5 segundos');
+                    }
+                }, 3000);
+            });
+        }
+        
+        function updateStatus(status, message) {
+            statusIndicator.className = `sync-status ${status}`;
+            
+            switch(status) {
+                case 'inactive':
+                    statusIndicator.textContent = 'Inactivo';
+                    break;
+                case 'active':
+                    statusIndicator.textContent = 'Activo';
+                    break;
+                case 'syncing':
+                    statusIndicator.textContent = 'Sincronizando...';
+                    break;
+                case 'error':
+                    statusIndicator.textContent = 'Error';
+                    break;
+            }
+            
+            syncInfo.textContent = message;
         }
     </script>
 </body>

@@ -84,26 +84,9 @@
             background: #667eea;
         }
         
-        .incidentes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .incidente-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-left: 6px solid #667eea;
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeIn 0.5s;
-        }
-        
-        .incidente-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         
         @keyframes fadeIn {
@@ -115,61 +98,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-        
-        .incidente-numero {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            word-wrap: break-word;
-        }
-        
-        .incidente-estado {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.95em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .estado-pendiente {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            color: #000;
-            box-shadow: 0 2px 5px rgba(255, 193, 7, 0.3);
-        }
-        
-        .estado-asignada {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: white;
-            box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
-        }
-        
-        .estado-cerrada {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-            color: white;
-            box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3);
-        }
-        
-        .incidente-fecha {
-            font-size: 0.85em;
-            color: #888;
-            line-height: 1.6;
-        }
-        
-        .fecha-label {
-            font-weight: 600;
-            color: #666;
-        }
-        
-        .no-incidentes {
-            text-align: center;
-            padding: 60px 20px;
-            color: #888;
-            font-size: 1.2em;
         }
         
         .stats-bar {
@@ -195,6 +123,164 @@
             color: #666;
             margin-top: 5px;
             font-size: 0.9em;
+        }
+        
+        /* Estilos para vista Kanban */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .kanban-column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 500px;
+        }
+        
+        .column-header {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: white;
+            position: relative;
+        }
+        
+        .column-header .count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: #333;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .header-pendiente {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+        }
+        
+        .header-asignada {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+        }
+        
+        .header-cerrada {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .kanban-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .incidente-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideIn 0.4s ease-out;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .incidente-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .incidente-card.changed {
+            animation: highlightChange 1s ease-out;
+        }
+        
+        @keyframes highlightChange {
+            0% {
+                background: #fff3cd;
+                transform: scale(1.05);
+            }
+            100% {
+                background: white;
+                transform: scale(1);
+            }
+        }
+        
+        .change-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+            animation: bounce 0.6s ease-out;
+            z-index: 10;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .incidente-numero {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+        }
+        
+        .incidente-fecha {
+            font-size: 0.8em;
+            color: #888;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        
+        .fecha-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .no-incidentes {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 1024px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -230,8 +316,30 @@
             </div>
         </div>
         
-        <div class="incidentes-grid" id="incidentesGrid">
-            <!-- Los incidentes se cargarán aquí dinámicamente -->
+        <div class="kanban-board">
+            <div class="kanban-column">
+                <div class="column-header header-pendiente">
+                    ⏳ PENDIENTE
+                    <span class="count-badge" id="countPendientes">0</span>
+                </div>
+                <div class="kanban-cards" id="columnPendiente"></div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header header-asignada">
+                    🔧 ASIGNADA
+                    <span class="count-badge" id="countAsignadas">0</span>
+                </div>
+                <div class="kanban-cards" id="columnAsignada"></div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="column-header header-cerrada">
+                    ✅ CERRADA
+                    <span class="count-badge" id="countCerradas">0</span>
+                </div>
+                <div class="kanban-cards" id="columnCerrada"></div>
+            </div>
         </div>
         
         <div class="no-incidentes" id="noIncidentes" style="display: none;">
@@ -243,6 +351,19 @@
         let socket = null;
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws/incidentes/`;
+        
+        // Guardar el estado anterior de los incidentes para detectar cambios
+        let estadosAnteriores = {};
+        
+        // Cargar estados anteriores del localStorage
+        try {
+            const savedStates = localStorage.getItem('incidentesEstados');
+            if (savedStates) {
+                estadosAnteriores = JSON.parse(savedStates);
+            }
+        } catch (e) {
+            console.error('Error al cargar estados anteriores:', e);
+        }
         
         function conectarWebSocket() {
             socket = new WebSocket(wsUrl);
@@ -289,7 +410,6 @@
         }
         
         function actualizarIncidentes(incidentes) {
-            const grid = document.getElementById('incidentesGrid');
             const noIncidentes = document.getElementById('noIncidentes');
             
             // Actualizar estadísticas
@@ -303,44 +423,110 @@
             document.getElementById('totalAsignadas').textContent = asignadas;
             document.getElementById('totalCerradas').textContent = cerradas;
             
+            // Actualizar contadores en las columnas
+            document.getElementById('countPendientes').textContent = pendientes;
+            document.getElementById('countAsignadas').textContent = asignadas;
+            document.getElementById('countCerradas').textContent = cerradas;
+            
             if (incidentes.length === 0) {
-                grid.innerHTML = '';
+                limpiarColumnas();
                 noIncidentes.style.display = 'block';
                 return;
             }
             
             noIncidentes.style.display = 'none';
-            grid.innerHTML = '';
+            
+            // Limpiar columnas
+            limpiarColumnas();
+            
+            // Detectar cambios y actualizar estados
+            const nuevosEstados = {};
             
             incidentes.forEach(incidente => {
-                const card = crearCardIncidente(incidente);
-                grid.appendChild(card);
+                const estadoAnterior = estadosAnteriores[incidente.numero_incidente];
+                const cambioEstado = estadoAnterior && estadoAnterior !== incidente.estado;
+                
+                // Guardar nuevo estado
+                nuevosEstados[incidente.numero_incidente] = incidente.estado;
+                
+                const card = crearCardIncidente(incidente, cambioEstado);
+                
+                // Agregar a la columna correspondiente
+                const columnId = `column${capitalize(incidente.estado)}`;
+                const column = document.getElementById(columnId);
+                if (column) {
+                    column.appendChild(card);
+                }
             });
+            
+            // Guardar estados actuales
+            estadosAnteriores = nuevosEstados;
+            try {
+                localStorage.setItem('incidentesEstados', JSON.stringify(nuevosEstados));
+            } catch (e) {
+                console.error('Error al guardar estados:', e);
+            }
         }
         
-        function crearCardIncidente(incidente) {
+        function limpiarColumnas() {
+            document.getElementById('columnPendiente').innerHTML = '';
+            document.getElementById('columnAsignada').innerHTML = '';
+            document.getElementById('columnCerrada').innerHTML = '';
+        }
+        
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        
+        function crearCardIncidente(incidente, cambioEstado = false) {
             const card = document.createElement('div');
             card.className = 'incidente-card';
             
-            const estadoTexto = {
-                'pendiente': 'Pendiente',
-                'asignada': 'Asignada',
-                'cerrada': 'Cerrada'
-            };
+            if (cambioEstado) {
+                card.classList.add('changed');
+            }
             
-            const fechaCreacion = new Date(incidente.fecha_creacion).toLocaleString('es-AR');
-            const fechaActualizacion = new Date(incidente.fecha_actualizacion).toLocaleString('es-AR');
+            const fechaCreacion = new Date(incidente.fecha_creacion).toLocaleString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const fechaActualizacion = new Date(incidente.fecha_actualizacion).toLocaleString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            let badgeHtml = '';
+            if (cambioEstado) {
+                badgeHtml = '<div class="change-badge">CAMBIÓ ✨</div>';
+            }
             
             card.innerHTML = `
+                ${badgeHtml}
                 <div class="incidente-numero">${incidente.numero_incidente}</div>
-                <div class="incidente-estado estado-${incidente.estado}">
-                    ${estadoTexto[incidente.estado]}
-                </div>
                 <div class="incidente-fecha">
                     <div><span class="fecha-label">Creado:</span> ${fechaCreacion}</div>
                     <div><span class="fecha-label">Actualizado:</span> ${fechaActualizacion}</div>
                 </div>
             `;
+            
+            // Remover el badge después de 5 segundos
+            if (cambioEstado) {
+                setTimeout(() => {
+                    const badge = card.querySelector('.change-badge');
+                    if (badge) {
+                        badge.style.transition = 'opacity 0.5s';
+                        badge.style.opacity = '0';
+                        setTimeout(() => badge.remove(), 500);
+                    }
+                    card.classList.remove('changed');
+                }, 5000);
+            }
             
             return card;
         }

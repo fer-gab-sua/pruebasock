@@ -36,14 +36,37 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configurar la base de datos
+### 3. Configurar variables de entorno
+
+Copia el archivo de ejemplo y configura tus credenciales:
+
+```powershell
+# Windows
+copy .env.example .env
+
+# Linux/Mac
+cp .env.example .env
+```
+
+Edita el archivo `.env` y completa con tus credenciales de Metabase:
+
+```env
+METABASE_URL=http://tu-servidor-metabase.com/
+METABASE_USER=tu_usuario@ejemplo.com
+METABASE_PASSWORD=tu_contraseña
+METABASE_CARD_ID=51
+```
+
+**Nota**: El archivo `.env` está en `.gitignore` para no subir credenciales al repositorio.
+
+### 4. Configurar la base de datos
 
 ```powershell
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 4. Crear un superusuario (opcional, para acceder al admin de Django)
+### 5. Crear un superusuario (opcional, para acceder al admin de Django)
 
 ```powershell
 python manage.py createsuperuser

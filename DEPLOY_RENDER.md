@@ -44,6 +44,10 @@ En la sección "Environment Variables" de Render, agrega:
 | `PYTHON_VERSION` | `3.12.0` | Versión de Python |
 | `SECRET_KEY` | (genera una clave segura) | Click en "Generate" |
 | `DEBUG` | `False` | IMPORTANTE: debe ser False en producción |
+| `METABASE_URL` | `http://157.230.229.30/` | URL de tu servidor Metabase |
+| `METABASE_USER` | `tu_usuario@ejemplo.com` | Usuario de Metabase |
+| `METABASE_PASSWORD` | `tu_contraseña` | Contraseña de Metabase |
+| `METABASE_CARD_ID` | `51` | ID del reporte/card de Metabase |
 
 **Generar SECRET_KEY segura:**
 ```python
